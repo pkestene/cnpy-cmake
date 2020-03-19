@@ -158,5 +158,8 @@ install(
 install(
   FILES cnpy.h
   DESTINATION ${INSTALL_INCLUDEDIR})
+install(
+  FILES zlib/crc32.h zlib/zconf_cnpy.h zlib/zlib_cnpy.h zlib/zutil_cnpy.h
+  DESTINATION ${INSTALL_INCLUDEDIR}/zlib)
 
 
