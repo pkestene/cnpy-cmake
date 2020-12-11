@@ -7,7 +7,31 @@ This utility is written by Carl Rogers: https://github.com/rogersce/cnpy
 
 The original code has been slightly refactored (cmake) to provide a pkgconfig file and an installation process.
 
-# example of use
+# How to build ?
+
+You can off-course customize the install path.
+
+
+
+```shell
+export CNPY_INSTALL_PATH=/opt/cnpy-0.1.0
+mkdir _build; cd _build
+cmake -DCMAKE_INSTALL_PREFIX=$CNPY_INSTALL_PATH ..
+make
+make install
+```
+
+# How to use cnpy from autotools ?
+
+Place the following lines in your .bashrc file:
+
+```bash
+export CNPY_INSTALL_PATH=/opt/cnpy-0.1.0
+export PKG_CONFIG_PATH=$CNPY_INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH
+export LD_LIBRARY_PATH=$CNPY_INSTALL_PATH/lib:$LD_LIBRARY_PATH
+```
+
+# Example of use
 
 Create data in C++, and save them into a file :
 
