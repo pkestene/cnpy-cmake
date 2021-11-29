@@ -5,8 +5,7 @@ includedir=@includedir@
 
 Name: eclairs-common
 Description: IO Library prodiving a python/numpy compatible file format. 
-Requires:
-Requires.private: zlib
+Requires: zlib
 Version: @VERSION@
 Libs: -L${libdir} -lcnpy
 Cflags: -I${includedir}
