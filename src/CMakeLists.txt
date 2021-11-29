@@ -4,14 +4,14 @@ set (BUILD_SHARED TRUE)
 
 # but if cross-compile target is LEON3, disable shared library building
 if (CMAKE_CROSSCOMPILING)
-  
+
   # test if we are cross-compiling for leon
   string(COMPARE EQUAL ${MY_CROSS_COMPILE_TARGET} "sparc-gaisler-elf" is_leon)
-  
+
   if (is_leon)
     set(BUILD_SHARED FALSE)
   endif (is_leon)
-  
+
 endif (CMAKE_CROSSCOMPILING)
 
 # setup the list of targets to install
@@ -31,15 +31,16 @@ if (BUILD_SHARED)
 
   target_sources(cnpy
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/cnpy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/zlib/crc32.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/cnpy.cpp)
 
   target_include_directories(cnpy
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>
     )
-  
+
+  target_link_libraries(cnpy PUBLIC ZLIB::ZLIB)
+
   set_target_properties(cnpy PROPERTIES LINKER_LANGUAGE CXX)
 
   add_library(cnpy::cnpy ALIAS cnpy)
@@ -55,14 +56,15 @@ add_library(cnpy-static STATIC "")
 
 target_sources(cnpy-static
   PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/cnpy.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/zlib/crc32.c)
+  ${CMAKE_CURRENT_SOURCE_DIR}/cnpy.cpp)
 
 target_include_directories(cnpy-static
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include>
   )
+
+target_link_libraries(cnpy-static PUBLIC ZLIB::ZLIB)
 
 set_target_properties(cnpy-static PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(cnpy-static PROPERTIES OUTPUT_NAME cnpy)
@@ -158,8 +160,5 @@ install(
 install(
   FILES cnpy.h
   DESTINATION ${INSTALL_INCLUDEDIR})
-install(
-  FILES zlib/crc32.h zlib/zconf_cnpy.h zlib/zlib_cnpy.h zlib/zutil_cnpy.h
-  DESTINATION ${INSTALL_INCLUDEDIR}/zlib)
 
 
