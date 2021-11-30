@@ -147,7 +147,7 @@ template <typename T>
 void npy_save(std::string fname, const T *data, const unsigned int *shape,
               const unsigned int ndims, std::string mode = "w") {
   std::vector<size_t> shapev;
-  for (int i = 0; i < ndims; ++i)
+  for (unsigned int i = 0; i < ndims; ++i)
     shapev.push_back(shape[i]);
 
   npy_save(fname, data, shapev, mode);
@@ -258,7 +258,7 @@ void npz_save(std::string zipname, std::string fname, const T *data,
               const unsigned int *shape, const unsigned int ndims,
               std::string mode = "w") {
   std::vector<size_t> shapev;
-  for (int i = 0; i < ndims; ++i)
+  for (unsigned int i = 0; i < ndims; ++i)
     shapev.push_back(shape[i]);
 
   npz_save(zipname, fname, data, shapev, mode);
