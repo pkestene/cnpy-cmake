@@ -14,7 +14,7 @@ You can off-course customize the install path.
 
 
 ```shell
-export CNPY_INSTALL_PATH=/opt/cnpy-0.1.0
+export CNPY_INSTALL_PATH=/opt/cnpy-0.2.0
 mkdir _build; cd _build
 cmake -DCMAKE_INSTALL_PREFIX=$CNPY_INSTALL_PATH ..
 make
@@ -26,7 +26,7 @@ make install
 Place the following lines in your .bashrc file:
 
 ```bash
-export CNPY_INSTALL_PATH=/opt/cnpy-0.1.0
+export CNPY_INSTALL_PATH=/opt/cnpy-0.2.0
 export PKG_CONFIG_PATH=$CNPY_INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH
 export LD_LIBRARY_PATH=$CNPY_INSTALL_PATH/lib:$LD_LIBRARY_PATH
 ```

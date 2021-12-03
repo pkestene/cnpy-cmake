@@ -13,7 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# zlib is not required as a private dependency
+# zlib is required as a public dependency
 find_package(ZLIB REQUIRED)
 
 # gnu compatibility,
