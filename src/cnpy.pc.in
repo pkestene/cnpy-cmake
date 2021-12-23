@@ -3,7 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: eclairs-common
+Name: cnpy
 Description: IO Library prodiving a python/numpy compatible file format. 
 Requires: zlib
 Version: @VERSION@
