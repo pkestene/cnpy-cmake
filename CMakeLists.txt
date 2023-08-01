@@ -6,6 +6,9 @@ project(cnpy VERSION 0.2.0 LANGUAGES ${PROJECT_LANGUAGES})
 # default local cmake macro repository
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# set default build type
+include(cmake/set_build_type.cmake)
+
 # always export compile commands database
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
