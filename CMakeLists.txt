@@ -1,13 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(PROJECT_LANGUAGES ${PROJECT_LANGUAGES} C CXX)
-project(cnpy VERSION 0.2.0 LANGUAGES ${PROJECT_LANGUAGES})
+if(NOT DEFINED PROJECT_NAME)
+  set(CNPY_IS_TOP_LEVEL ON)
+else()
+  set(CNPY_IS_TOP_LEVEL OFF)
+endif()
 
-# default local cmake macro repository
-list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+project(cnpy VERSION 0.2.0 LANGUAGES C CXX)
 
 # set default build type
 include(cmake/set_build_type.cmake)
+
+option(CNPY_BUILD_TESTS "Build tests" ON)
 
 # always export compile commands database
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -24,11 +28,16 @@ find_package(ZLIB REQUIRED)
 include(GNUInstallDirs)
 
 # macro helper to generate pkg-config file
-include(generate_pkg_config)
+include(cmake/generate_pkg_config.cmake)
 
 # build sources
 add_subdirectory(src)
 add_subdirectory(example)
+
+if(CNPY_BUILD_TESTS AND CNPY_IS_TOP_LEVEL)
+  include(CTest)
+  add_subdirectory(tests)
+endif()
 
 
 ##################### PRINT CONFIGURE STATUS ######################
