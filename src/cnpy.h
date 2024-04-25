@@ -29,12 +29,12 @@ struct NpyArray
     : shape(_shape)
     , word_size(_word_size)
     , fortran_order(_fortran_order)
-  {
-    num_vals = 1;
-    for (size_t i = 0; i < shape.size(); i++)
-      num_vals *= shape[i];
-    data_holder = std::shared_ptr<std::vector<char>>(new std::vector<char>(num_vals * word_size));
-  }
+    , num_vals(std::accumulate(_shape.begin(),
+                               _shape.end(),
+                               static_cast<size_t>(1),
+                               std::multiplies<size_t>()))
+    , data_holder(new std::vector<char>(num_vals * word_size))
+  {}
 
   NpyArray()
     : shape(0)
@@ -71,11 +71,11 @@ struct NpyArray
     return data_holder->size();
   }
 
-  std::shared_ptr<std::vector<char>> data_holder;
   std::vector<size_t>                shape;
   size_t                             word_size;
   bool                               fortran_order;
   size_t                             num_vals;
+  std::shared_ptr<std::vector<char>> data_holder;
 };
 
 using npz_t = std::map<std::string, NpyArray>;
