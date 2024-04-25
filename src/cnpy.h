@@ -177,7 +177,8 @@ npy_save(std::string fname, const T * data, const std::vector<size_t> shape, std
   }
 
   std::vector<char> header = create_npy_header<T>(true_data_shape);
-  size_t nels = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<size_t>());
+  size_t            nels =
+    std::accumulate(shape.begin(), shape.end(), static_cast<size_t>(1), std::multiplies<size_t>());
 
   fseek(fp, 0, SEEK_SET);
   fwrite(&header[0], sizeof(char), header.size(), fp);
@@ -246,7 +247,8 @@ npz_save(std::string                 zipname,
 
   std::vector<char> npy_header = create_npy_header<T>(shape);
 
-  size_t nels = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<size_t>());
+  size_t nels =
+    std::accumulate(shape.begin(), shape.end(), static_cast<size_t>(1), std::multiplies<size_t>());
   size_t nbytes = nels * sizeof(T) + npy_header.size();
 
   // get the CRC of the data to be added
