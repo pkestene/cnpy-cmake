@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <stdint.h>
 #include <stdexcept>
+#include <sstream>
 #include <regex>
 
 char
@@ -116,7 +117,10 @@ cnpy::parse_npy_header(unsigned char *       buffer,
   std::string str_shape = header.substr(loc1 + 1, loc2 - loc1 - 1);
   while (std::regex_search(str_shape, sm, num_regex))
   {
-    shape.push_back(std::stoi(sm[0].str()));
+    std::stringstream stream(sm[0].str());
+    size_t            size;
+    stream >> size;
+    shape.push_back(size);
     str_shape = sm.suffix().str();
   }
 
@@ -170,7 +174,11 @@ cnpy::parse_npy_header(FILE *                fp,
   std::string str_shape = header.substr(loc1 + 1, loc2 - loc1 - 1);
   while (std::regex_search(str_shape, sm, num_regex))
   {
-    shape.push_back(std::stoi(sm[0].str()));
+    std::stringstream stream(sm[0].str());
+    size_t            size;
+    stream >> size;
+
+    shape.push_back(size);
     str_shape = sm.suffix().str();
   }
 
