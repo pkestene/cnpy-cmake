@@ -41,6 +41,10 @@ if (BUILD_SHARED)
 
   target_link_libraries(cnpy PUBLIC ZLIB::ZLIB)
 
+  if(CNPY_USE_MPI)
+    target_link_libraries(cnpy PUBLIC MPI::MPI_CXX)
+  endif()
+
   set_target_properties(cnpy PROPERTIES LINKER_LANGUAGE CXX)
 
   add_library(cnpy::cnpy ALIAS cnpy)
@@ -65,6 +69,9 @@ target_include_directories(cnpy-static
   )
 
 target_link_libraries(cnpy-static PUBLIC ZLIB::ZLIB)
+if(CNPY_USE_MPI)
+  target_link_libraries(cnpy-static PUBLIC MPI::MPI_CXX)
+endif()
 
 set_target_properties(cnpy-static PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(cnpy-static PROPERTIES OUTPUT_NAME cnpy)
@@ -160,5 +167,3 @@ install(
 install(
   FILES cnpy.h
   DESTINATION ${INSTALL_INCLUDEDIR})
-
-

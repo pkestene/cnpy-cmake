@@ -23,6 +23,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # zlib is required as a public dependency
 find_package(ZLIB REQUIRED)
 
+# optional
+find_package(MPI)
+if (MPI_CXX_FOUND)
+  set(CNPY_USE_MPI True)
+  add_definitions(-DCNPY_USE_MPI)
+  set(MPIEXEC_MAX_NUMPROCS "4" CACHE STRING "Maximum number of MPI tasks used in unit testing.")
+  set(MPIEXEC_OPTION_FLAGS "--oversubscribe" CACHE STRING "Optionnal flags passed MPIEXEC.")
+endif()
+
 # gnu compatibility,
 # see https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html
 include(GNUInstallDirs)
@@ -63,4 +72,11 @@ message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} "
   "${CMAKE_CXX_COMPILER_WRAPPER}")
 message("    ${CMAKE_CXX_COMPILER}")
 message("")
-message(" ZLIB found : ${ZLIB_FOUND}")
+message(STATUS "ZLIB found : ${ZLIB_FOUND}")
+message(STATUS "MPI found : ${MPI_CXX_FOUND}")
+if(MPI_CXX_FOUND)
+  message(STATUS "MPI compile flags: " ${MPI_CXX_COMPILE_FLAGS})
+  message(STATUS "MPI include path: " ${MPI_CXX_INCLUDE_PATH})
+  message(STATUS "MPI LINK flags path: " ${MPI_CXX_LINK_FLAGS})
+  message(STATUS "MPI libraries: " ${MPI_CXX_LIBRARIES})
+endif()

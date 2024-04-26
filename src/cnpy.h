@@ -20,9 +20,15 @@
 #include <vector>
 #include <zlib.h>
 
+#ifdef CNPY_USE_MPI
+#  include "cnpy_mpi_utils.h"
+#endif
+
 namespace cnpy
 {
 
+// ====================================================================================
+// ====================================================================================
 struct NpyArray
 {
   NpyArray(const std::vector<size_t> & _shape, size_t _word_size, bool _fortran_order)
@@ -82,13 +88,17 @@ using npz_t = std::map<std::string, NpyArray>;
 
 char
 BigEndianTest();
+
 char
 map_type(const std::type_info & t);
+
 template <typename T>
 std::vector<char>
 create_npy_header(const std::vector<size_t> & shape);
+
 void
 parse_npy_header(FILE * fp, size_t & word_size, std::vector<size_t> & shape, bool & fortran_order);
+
 void
 parse_npy_header(unsigned char *       buffer,
                  size_t &              word_size,
@@ -101,8 +111,10 @@ parse_zip_footer(FILE *     fp,
                  size_t &   global_header_offset);
 npz_t
 npz_load(std::string fname);
+
 NpyArray
 npz_load(std::string fname, std::string varname);
+
 NpyArray
 npy_load(std::string fname);
 
@@ -122,10 +134,13 @@ operator+=(std::vector<char> & lhs, const T rhs)
 template <>
 std::vector<char> &
 operator+=(std::vector<char> & lhs, const std::string rhs);
+
 template <>
 std::vector<char> &
 operator+=(std::vector<char> & lhs, const char * rhs);
 
+// ====================================================================================
+// ====================================================================================
 template <typename T>
 void
 npy_save(std::string fname, const T * data, const std::vector<size_t> shape, std::string mode = "w")
@@ -187,6 +202,65 @@ npy_save(std::string fname, const T * data, const std::vector<size_t> shape, std
   fclose(fp);
 }
 
+#ifdef CNPY_USE_MPI
+// ====================================================================================
+// ====================================================================================
+/**
+ * Write a npy file using MPI-IO.
+ *
+ * Only 1d data is supported, no append, just plain write.
+ *
+ * Each MPI process must specify its local_size, i.e. how many data elements will be written; the
+ * routine will compute the global size (shape) using MPI_Reduce.
+ */
+template <typename T>
+void
+npy_save(MPI_Comm mpi_comm, std::string fname, const T * data, size_t local_size)
+{
+  int rank = 0;
+  MPI_CHECK_ERR(MPI_Comm_rank(mpi_comm, &rank));
+
+  // compute global size, i.e. shape.
+  size_t global_size = 0;
+  MPI_CHECK_ERR(MPI_Reduce(&local_size, &global_size, 1, mpi_type<size_t>(), MPI_SUM, 0, mpi_comm));
+
+  // each MPI process can compute its offset inside the global array
+  MPI_Offset offset = 0;
+  MPI_CHECK_ERR(MPI_Exscan(&local_size, &offset, 1, mpi_type<size_t>(), MPI_SUM, mpi_comm));
+
+  // compute offset in bytes
+  auto offset_bytes = offset * sizeof(T);
+
+  // MPI file handler
+  MPI_File fh;
+  auto     cmode = MPI_MODE_CREATE | MPI_MODE_RDWR;
+  MPI_CHECK_ERR(MPI_File_open(mpi_comm, fname.c_str(), cmode, MPI_INFO_NULL, &fh));
+
+  // only process 0 writes header
+  std::vector<size_t> shape{ global_size };
+  std::vector<char>   header = create_npy_header<T>(shape);
+  size_t              nels = global_size;
+  MPI_Status          status;
+
+  MPI_CHECK_ERR(MPI_File_set_view(fh, 0, MPI_CHAR, MPI_CHAR, "native", MPI_INFO_NULL));
+  if (rank == 0)
+  {
+    MPI_CHECK_ERR(MPI_File_write(fh, &header[0], header.size(), MPI_CHAR, &status));
+  }
+
+  MPI_CHECK_ERR(MPI_File_set_view(
+    fh, header.size() + offset_bytes, mpi_type<T>(), mpi_type<T>(), "native", MPI_INFO_NULL));
+
+  // fwrite(data, sizeof(T), nels, fp);
+  MPI_CHECK_ERR(MPI_File_write_all(fh, data, local_size, mpi_type<T>(), &status));
+
+  // close the file collectively
+  MPI_CHECK_ERR(MPI_File_close(&fh));
+}
+#endif
+
+// ====================================================================================
+// ====================================================================================
 template <typename T>
 void
 npy_save(std::string          fname,
@@ -202,6 +276,8 @@ npy_save(std::string          fname,
   npy_save(fname, data, shapev, mode);
 }
 
+// ====================================================================================
+// ====================================================================================
 template <typename T>
 void
 npz_save(std::string                 zipname,
@@ -309,6 +385,8 @@ npz_save(std::string                 zipname,
   fclose(fp);
 }
 
+// ====================================================================================
+// ====================================================================================
 template <typename T>
 void
 npz_save(std::string          zipname,
@@ -325,6 +403,8 @@ npz_save(std::string          zipname,
   npz_save(zipname, fname, data, shapev, mode);
 }
 
+// ====================================================================================
+// ====================================================================================
 template <typename T>
 void
 npy_save(std::string fname, const std::vector<T> data, std::string mode = "w")
@@ -334,6 +414,8 @@ npy_save(std::string fname, const std::vector<T> data, std::string mode = "w")
   npy_save(fname, &data[0], shape, mode);
 }
 
+// ====================================================================================
+// ====================================================================================
 template <typename T>
 void
 npz_save(std::string zipname, std::string fname, const std::vector<T> data, std::string mode = "w")
@@ -343,6 +425,8 @@ npz_save(std::string zipname, std::string fname, const std::vector<T> data, std:
   npz_save(zipname, fname, &data[0], shape, mode);
 }
 
+// ====================================================================================
+// ====================================================================================
 template <typename T>
 std::vector<char>
 create_npy_header(const std::vector<size_t> & shape)

@@ -1,6 +1,4 @@
-/* g++ -o example example.cpp cnpy.cpp -lz */
-
-#include "cnpy.h"
+#include <cnpy.h>
 #include <complex>
 #include <cstdlib>
 #include <iostream>
