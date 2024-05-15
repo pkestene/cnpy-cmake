@@ -11,7 +11,7 @@ project(cnpy VERSION 0.2.0 LANGUAGES C CXX)
 # set default build type
 include(cmake/set_build_type.cmake)
 
-option(CNPY_BUILD_TESTS "Build tests" ON)
+option(CNPY_BUILD_TESTS "Build tests" OFF)
 
 # always export compile commands database
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
