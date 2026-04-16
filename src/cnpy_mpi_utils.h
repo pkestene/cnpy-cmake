@@ -70,6 +70,15 @@ mpi_type<uint32_t>()
   return MPI_UINT32_T;
 }
 
+#ifdef __APPLE__
+template <>
+inline MPI_Datatype
+mpi_type<unsigned long>()
+{
+  return MPI_UNSIGNED_LONG;
+}
+#endif // __APPLE__
+
 template <>
 inline MPI_Datatype
 mpi_type<uint16_t>()
